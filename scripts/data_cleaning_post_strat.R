@@ -12,7 +12,7 @@ library(haven)
 library(tidyverse)
 
 # Read in the raw data 
-raw_post <- read_dta("inputs/data/usa_00002.dta")
+raw_post <- read_dta(here("inputs/data/usa_00002.dta"))
 raw_post <- labelled::to_factor(raw_post)  # labeling columns 
 
 

@@ -15,7 +15,7 @@ library(tidyverse)
 library(forcats)
 library(dplyr)
 # Read in the raw data 
-raw_data <- read_dta("inputs/data/ns20200625/ns20200625.dta")
+raw_data <- read_dta(here("inputs/data/ns20200625/ns20200625.dta"))
 
 # Add the labels
 raw_data <- labelled::to_factor(raw_data)
@@ -91,3 +91,4 @@ voter_data <-  survey_data  %>% filter(vote_intention == 1)
 rm(raw_data)
 rm(reduced_data)
 rm(data)
+rm(survey_data)

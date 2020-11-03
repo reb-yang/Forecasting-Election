@@ -17,8 +17,7 @@ state_names <- tibble(state_full = c(tolower(state.name), "district of columbia"
                       state = c(state.abb, "DC"))   
 # adding dc to state names
 
-electoral_college <- read_xlsx("inputs/data/electoral_vote_by_state.xlsx")
-
+electoral_college <- read_xlsx("../inputs/data/electoral_vote_by_state.xlsx")
 
 # electoral college vote distribution by state
 electoral_college <- electoral_college %>%
