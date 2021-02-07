@@ -9,6 +9,8 @@ The purpose is to create a report that about a model that I built to forecast th
 
 Biden predicted to win 55% of popular vote with margin of error of 4% and between 284 and 444 electoral votes. In 4000 different ways the electoral college could swing, Biden won in 99% of them, Trump won in 1%, with <0.1% chance of a tie. 
 
+Update 11/4: Wow evidently I was really wrong
+
 # Inputs 
 
 Inputs contain data that are unchanged from their original. 
