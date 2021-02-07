@@ -18,11 +18,11 @@ output: pdf_document
 bibliography: references.bib
 nocite: | 
   @R, @tidyverse, @haven, @brms1, @brms2, @surveydata, @poststratdata, @kableExtra, @rstan, @forcats, @fiftystater, @ggthemes, @tidybayes,
-  @broom.mixed, @dplyr, @gridExtra, @ggpubr, @markdown1, @markdown2, @markdown3, @ggplot
+  @broom.mixed,  @gridExtra, @ggpubr, @markdown1, @markdown2, @markdown3
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, dev="cairo_pdf", fig.align = "center")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, dev="cairo_pdf", fig.align = "center", root.dir = "../")
 library(here)
 library(tidyverse)
 library(kableExtra)
@@ -36,11 +36,10 @@ library(bayesplot)
 library(gridExtra)
 library(ggpubr)
 library(dplyr)
-library(ggplot2)
 # devtools::install_github("wmurphyrd/fiftystater")  # package for making map 
-source(here("/scripts/auxiliary_data.R"), local = knitr::knit_global())  # loading in data from
-source(here("/scripts/data_cleaning_survey.R"), local = knitr::knit_global())
-source(here("/scripts/data_cleaning_post_strat.R"), local = knitr::knit_global())
+source(here("scripts/auxiliary_data.R"), local = knitr::knit_global())  # loading in data from scripts
+source(here("scripts/data_cleaning_survey.R"), local = knitr::knit_global())
+source(here("scripts/data_cleaning_post_strat.R"), local = knitr::knit_global())
 
 ```
 # Introduction
@@ -360,8 +359,7 @@ In other words, the probability that an individual voter $i$ will support Biden 
 As mentioned earlier, the variables included in the model are limited by the ACS, so they are all demographic variables. 
 Nationscape selected their participants based on age, sex, income, race, and education. Given that respondents were selected based on their membership in these groups, a multilevel model was fitted according to these groups. These demographic variables, with the exception of sex, were all included in the model as group level effects, or varying intercepts, as each level has its own intercept that contributes to the predicted probability.
 
-This multilevel structure allows for the data to be pooled between groups. This means that if there are is a small number of respondents for a group in the sample, the estimate for that group is not completely dependent on those few responses. Instead, those responses will have some effect, but the estimate will also be informed by the other groups. For example, even though North Dakota has three responses in the Nationscape sample, its state effect will be drawn towards the mean of the other states' effects, since three respondents is hardly a sufficient representation. The main underlying assumption here is that the groups are different, but not altogether independent from each other [@kennedy]. While the rationale could extend the sex variable, grouping has been found to be inconsequential for groups with less than 3 levels, so it is included as a categorical indicator variable here [@park_gelman]. Since there are 15,327 post stratification cells, and 4714 observations in the original data, the ability to pool the data is indeed utilized here. 
-
+This multilevel structure allows for the data to be pooled between groups. This means that if there are is a small number of respondents for a group in the sample, the estimate for that group is not completely dependent on those few responses. Instead, those responses will have some effect, but the estimate will also be informed by the other groups. For example, even though North Dakota has three responses in the Nationscape sample, its state effect will be drawn towards the mean of the other states' effects, since three respondents is hardly a sufficient representation. The main underlying assumption here is that the groups are different, but not altogether independent from each other [@kennedy]. While the rationale could extend the sex variable, grouping has been found to be inconsequential for groups with less than 3 levels, so it is included as a categorical indicator variable here [@park_gelman]. 
 
 Income is included in the model as it has been found to affect voting patterns in different states [@richstate]. In addition, the 2016 election, there were larger-than-normal gaps in vote choice between races, sexes, and education levels [@pew]. States are included in the model since the presidential election is essentially decided on a state-by-state basis, and the mainstream categorization of states as "red", "blue", and "swing" reflects the differences in political preferences between states. States also have their own governments, political systems, and cultures that affect their residents. Previous research supports the ability of these to predict election results [@park_gelman; @yair_gelman; @xbox]. 
 
@@ -385,7 +383,7 @@ Earlier versions of the model were fitted as generalized linear mixed effect reg
 
 In the same vein, I considered using Trump's 2016 vote share in each state as a linear predictor in my model as was done by @yair_gelman and @xbox. The intention was to give the model an empirical foundation, so that it was not completely reliant on the polls. However, I found that the state effects conveyed similar information in the model and the predictions were nearly the same. While the Nationscape survey did ask about the respondent's vote in 2016, it was not a viable alternative to include in the model because the post-stratification data does not contain this information at the respondent level.
 
-At this point, I would like to openly and matter-of-factly address the convergence of the model. Indeed, in the sampling for the model, there was one divergent transition. This is an indication that the model may not be a good fit for the data at this stage, but there are ways in which this could be fixed through the algorithm settings^[I used `adapt_delta` = 0.99, but it has also been suggested to change `step_size` and `max_treedepth` from the defaults]. These, however, are computationally expensive, so for the purposes of this report, I proceed with the sub-par model. Thus, these results ought to be taken with the tiniest grain of salt. Additional model checks can be found in the Appendix.
+In the sampling for the model, there was one divergent transition. Divergences can be an indication that the model may not be a good fit for the data, however this was only occurred in 1 out of 4000 samples, so it is not any cause for concern^[I used `adapt_delta` = 0.99, but it has also been suggested to change `step_size` and `max_treedepth` from the defaults]. 
 
 ```{r} 
 # fitting multilevel model in brm 
@@ -683,7 +681,7 @@ Additionally, this would have implications on the way the data is pooled. For ex
 
 On the opposite end, the most notable intercept is race, specifically with regard to black voters. Given the current political climate, Black Lives Matter, and the resurgence of white supremacists, this is not altogether surprising. 
 
-With regard to my predictions, they are very heavily in Biden's favor. Of course, this was the same mindset many had going into the 2016 election, which did not end well, so I err on the side of caution. If he wins the right states, and the swing states tip in his favor, a Trump win should not be written out entirely. According to Figure 7, there are, although few, worlds in which Trump wins, so a Biden win should not be taken as a given. These are only based on 4,000 different paths to victory as well; there are tens of thousands of possibilities. I also reiterate here that these results were based on a questionable model, so the appropriate weight should be placed on its results. 
+With regard to my predictions, they are very heavily in Biden's favor. Of course, this was the same mindset many had going into the 2016 election, which did not end well, so I err on the side of caution. If he wins the right states, and the swing states tip in his favor, a Trump win should not be written out entirely. According to Figure 7, there are, although few, worlds in which Trump wins, so a Biden win should not be taken as a given. These are only based on 4,000 different paths to victory as well; there are tens of thousands of possibilities. 
 
 While the margin of error for the population level vote share is around 4%, the margins of error for the state level estimates are much larger, as illustrated by Figure 4. In some states, prediction interval spans 50%. Since the winner of the election hinges on state-level outcomes, these large margins are cause for concern. In the future, I could potentially improve this by setting stronger priors for the model. This model just used the default priors, so I would expect that informative priors would indeed provide more certainty to the estimates. Stronger priors could also help with the issue of divergent transitions. 
 
@@ -711,7 +709,7 @@ In addition, given that the model is configured to predict a binary outcome, it 
 
 In addition to the areas of improvement mentioned above, the model could also be expanded in several ways. There is a belief that the election can be predicted based on fundamental variables like the state of the economy and presidential popularity, and these are indeed incorporated in conjunction with survey data in the model used by The Economist [@economist]. Were I to do this, it would give the model an empirical foundation so that it was not completely reliant on the polls. Complexity could also be added to the model through interaction terms. For example, @richstate found that income had different effects on voting preferences in states depending on whether a state was relatively rich or poor. 
 
-Forecasting elections is a unique type of modeling exercise because there will actually be confirmation (or contradiction) of the model's predictions. When there are contradictions, there is something to be learned about the model and its shortcomings. In this paper, I have attempted to incorporate what was learned in the past election through the use of MRP to curb non-representativity. I conclude with a disclaimer of sorts. In the words of George Box, "All models are wrong, but some are useful".^[Although this is probably not one of those useful ones.] 
+Forecasting elections is a unique type of modeling exercise because there will actually be confirmation (or contradiction) of the model's predictions. When there are contradictions, there is something to be learned about the model and its shortcomings. In this paper, I have attempted to incorporate what was learned in the past election through the use of MRP to curb non-representativity. I conclude with a disclaimer of sorts. In the words of George Box, "All models are wrong, but some are useful".
 
 # Appendix
 
@@ -729,18 +727,7 @@ pp_1
 
 ```
 
-While the R-hat values are 1.00 and 1.01, it can be seen that the chains for age group, education, income, and race are not particularly well mixed. 
-```{r, fig.cap = "Trace plots to check model convergence", out.width = "50%"}
-post_hist <- mcmc_trace(vote_model,
-           pars = c("b_Intercept", 
-                    "b_sexmale", 
-                    "sd_age_group__Intercept", 
-                    "sd_race__Intercept",
-                    "sd_income__Intercept",
-                    "sd_education__Intercept",
-                    "sd_state__Intercept"))
-post_hist
-```
+
 
 The `loo` output confirms that there are no influential observations, as measured by the Pareto k estimates. 
 ```{r, out.width="50%", echo = TRUE}
